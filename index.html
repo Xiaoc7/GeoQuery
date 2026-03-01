@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GeoQuery: Geometry-Query Diffusion for Sparse-View Reconstruction</title>
+  
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  
+  <script type="module" src="https://unpkg.com/img-comparison-slider@8/dist/index.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/img-comparison-slider@8/dist/styles.css" />
+
+  <style>
+    /* ======================================================= */
+    /* 全局排版: 极简学术风                                    */
+    /* ======================================================= */
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      color: #4a4a4a;
+      background-color: #ffffff; 
+      line-height: 1.6;
+    }
+
+    h1, h2, h3, h4, h5, h6, .title, .section-title {
+      font-family: 'Google Sans', sans-serif !important;
+      color: #363636 !important;
+    }
+
+    .publication-title {
+      font-size: 2.6rem; 
+      font-weight: 700;
+      margin-bottom: 1.2rem !important;
+    }
+
+    /* ======================================================= */
+    /* 作者与机构排版美化 (全面应用 Google Sans)               */
+    /* ======================================================= */
+    .author-block {
+      display: inline-block;
+      margin-right: 8px; 
+      font-size: 1.3rem;
+      font-family: 'Google Sans', sans-serif; 
+      color: #363636; 
+      font-weight: 400; 
+    }
+    
+    .author-block sup {
+      color: #363636; 
+      font-size: 0.85rem;
+      margin-left: 2px;
+    }
+    /* 通讯作者信封图标样式微调 */
+    .author-block sup i {
+      font-size: 0.75rem; 
+      color: #363636; 
+      margin-left: 2px;
+    }
+
+    .institute-block {
+      font-size: 1.15rem;
+      color: #4a4a4a;
+      margin-top: 5px;
+      margin-bottom: 8px;
+      font-family: 'Google Sans', sans-serif; 
+    }
+    .institute-block sup {
+      margin-right: 2px;
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    .venue-block {
+      font-size: 1.1rem;
+      color: #666;
+      font-family: 'Google Sans', sans-serif; 
+    }
+
+    /* ======================================================= */
+    /* 按钮与区块通用样式                                      */
+    /* ======================================================= */
+    .publication-links .button {
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      border: none;
+      color: #fff;
+      font-weight: 500;
+      padding: 0 20px;
+      margin: 0 4px;
+    }
+    .publication-links .button:hover {
+      transform: translateY(-2px);
+      color: #fff;
+    }
+    
+    /* arXiv 经典红 */
+    .btn-arxiv {
+      background-color: #b31b1b; 
+      box-shadow: 0 4px 10px rgba(179, 27, 27, 0.2);
+    }
+    .btn-arxiv:hover { background-color: #8a1515; box-shadow: 0 6px 15px rgba(179, 27, 27, 0.3); }
+
+    /* Paper 学术蓝 */
+    .btn-paper {
+      background-color: #2b8cbe; 
+      box-shadow: 0 4px 10px rgba(43, 140, 190, 0.2);
+    }
+    .btn-paper:hover { background-color: #1e6b94; box-shadow: 0 6px 15px rgba(43, 140, 190, 0.3); }
+
+    /* Code GitHub黑 */
+    .btn-code {
+      background-color: #24292e; 
+      box-shadow: 0 4px 10px rgba(36, 41, 46, 0.2);
+    }
+    .btn-code:hover { background-color: #000000; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); }
+
+
+    .section-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    .content p {
+      font-size: 1.1rem;
+      margin-bottom: 1.2rem;
+      text-align: justify;
+      color: #444;
+    }
+
+    /* ======================================================= */
+    /* 滑块与标签核心样式                                      */
+    /* ======================================================= */
+    img-comparison-slider {
+      --divider-color: #ffffff;
+      --divider-width: 3px;
+      --default-handle-color: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #dbdbdb; 
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08); 
+      overflow: hidden;
+      margin-bottom: 0; 
+      width: 100%;
+      display: block;
+      transition: box-shadow 0.3s ease;
+    }
+
+    img-comparison-slider:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .slider-figure {
+      margin: 0;
+      position: relative;
+      width: 100%;
+    }
+
+    .slider-figure img {
+      width: 100%;
+      height: auto; 
+      display: block;
+    }
+
+    .slider-label {
+      position: absolute;
+      bottom: 15px; 
+      background: rgba(30, 30, 30, 0.75); 
+      color: #ffffff;
+      display: flex;
+      align-items: center;    
+      justify-content: center; 
+      width: auto;  
+      min-width: 90px;
+      height: 28px;  
+      margin: 0;
+      padding: 0 15px;    
+      border-radius: 20px;
+      font-size: 0.8rem; 
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      pointer-events: none; 
+      font-family: 'Google Sans', sans-serif;
+    }
+    .label-left { left: 15px; }
+    .label-right { right: 15px; }
+    
+    .comparison-caption {
+      text-align: center;
+      color: #555;
+      margin-top: 0.8rem;
+      margin-bottom: 1.5rem; 
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    /* ======================================================= */
+    /* 缩略图增强                                              */
+    /* ======================================================= */
+    .thumbnail-nav {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px; 
+      flex-wrap: wrap;
+    }
+    .thumbnail-btn {
+      width: 60px; 
+      height: 60px;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0; 
+      overflow: hidden;
+      cursor: pointer;
+      padding: 0;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+      transition: all 0.2s ease;
+    }
+    .thumbnail-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; 
+      display: block;
+    }
+    
+    .thumbnail-btn.is-active {
+      border-color: #3273dc; 
+      border-width: 3px;
+      box-shadow: 0 4px 12px rgba(50, 115, 220, 0.2);
+      transform: translateY(-2px);
+    }
+  
+    .slider-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+    }
+    .nav-arrow {
+      background: transparent;
+      border: none;
+      font-size: 2.5rem;
+      color: #c0c0c0;
+      cursor: pointer;
+      transition: color 0.3s, transform 0.2s;
+      padding: 10px 20px;
+      z-index: 10;
+    }
+    .nav-arrow:hover {
+      color: #4a4a4a;
+      transform: scale(1.1);
+    }
+    .slider-container {
+      flex-grow: 1;
+      max-width: 100%; 
+      margin: 0 10px;
+    }
+
+    /* Tabs 胶囊按钮美化 */
+    .tabs.is-toggle li.is-active a {
+      background-color: #363636;
+      border-color: #363636;
+      color: #fff;
+    }
+    .tabs a {
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 600;
+      border-color: #c5c5c5; 
+      color: #666;
+    }
+    .tabs a:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .method-section {
+      background-color: #f8f9fa;
+      border-top: 1px solid #eaeaea;
+      border-bottom: 1px solid #eaeaea;
+    }
+  </style>
+
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+
+<section class="hero is-small">
+  <div class="hero-body pt-5 pb-5">
+    <div class="container is-max-desktop has-text-centered">
+      <h1 class="title publication-title">GeoQuery: Geometry-Query Diffusion for<br>Sparse-View Reconstruction</h1>
+      
+      <div class="mb-3">
+        <span class="author-block">Xiao Cao<sup>1</sup>,</span>
+        <span class="author-block">Yuze Li<sup>2</sup>,</span>
+        <span class="author-block">Youmin Zhang<sup>3</sup>,</span>
+        <span class="author-block">Jiayu Song<sup>3</sup>,</span>
+        <span class="author-block">Cheng Yan<sup>2</sup>,</span>
+        <span class="author-block">Wen Li<sup>1, <i class="fas fa-envelope"></i></sup>,</span>
+        <span class="author-block">Lixin Duan<sup>1</sup></span>
+      </div>
+
+      <div class="institute-block mb-3">
+        <span><sup>1</sup>University of Electronic Science and Technology of China</span>&nbsp;&nbsp;&nbsp;
+        <span><sup>2</sup>Tianjin University</span>&nbsp;&nbsp;&nbsp;
+        <span><sup>3</sup>Rawmantic AI</span>
+      </div>
+
+      <div class="column has-text-centered">
+        <div class="publication-links">
+          <span class="link-block">
+            <a href="#" class="button btn-arxiv is-normal">
+              <span class="icon"><i class="ai ai-arxiv"></i></span>
+              <span>arXiv</span>
+            </a>
+          </span>
+          <span class="link-block">
+            <a href="#" class="button btn-paper is-normal">
+              <span class="icon"><i class="fas fa-file-pdf"></i></span>
+              <span>Paper</span>
+            </a>
+          </span>
+          <span class="link-block">
+            <a href="#" class="button btn-code is-normal">
+              <span class="icon"><i class="fab fa-github"></i></span>
+              <span>Code (Coming Soon)</span>
+            </a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section pt-3 pb-3">
+  <div class="container is-max-widescreen">
+    <p class="has-text-centered" style="margin-bottom: 1.5rem; color: #666;">
+      <i>Drag the slider to compare baseline methods with our GeoQuery.</i>
+    </p>
+
+    <div class="columns is-centered">
+      <div class="column is-full has-text-centered">
+        
+        <div id="thumbnail-container" class="thumbnail-nav"></div>
+  
+        <div class="slider-wrapper">
+          <button class="nav-arrow" onclick="prevCase()">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+  
+          <div class="slider-container" style="padding: 0 10px;">
+            <div class="columns is-mobile is-centered is-variable is-2">
+              
+              <div class="column is-half">
+                <img-comparison-slider hover="hover">
+                  <figure slot="first" class="slider-figure">
+                    <img id="carousel-img-3dgs" src="./images/artifacts_removal/case1/3dgs.png" alt="3DGS" />
+                    <figcaption class="slider-label label-left">3DGS</figcaption>
+                  </figure>
+                  <figure slot="second" class="slider-figure">
+                    <img id="carousel-img-ours-1" src="./images/artifacts_removal/case1/geoquery.png" alt="GeoQuery" />
+                    <figcaption class="slider-label label-right">Ours</figcaption>
+                  </figure>
+                </img-comparison-slider>
+                <p class="comparison-caption">Ours vs. 3DGS</p>
+              </div>
+  
+              <div class="column is-half">
+                <img-comparison-slider hover="hover">
+                  <figure slot="first" class="slider-figure">
+                    <img id="carousel-img-difix" src="./images/artifacts_removal/case1/difix.png" alt="DIFIX3D+" />
+                    <figcaption class="slider-label label-left">DIFIX3D+</figcaption>
+                  </figure>
+                  <figure slot="second" class="slider-figure">
+                    <img id="carousel-img-ours-2" src="./images/artifacts_removal/case1/geoquery.png" alt="GeoQuery" />
+                    <figcaption class="slider-label label-right">Ours</figcaption>
+                  </figure>
+                </img-comparison-slider>
+                <p class="comparison-caption">Ours vs. DIFIX3D+</p>
+              </div>
+  
+            </div>
+          </div>
+  
+          <button class="nav-arrow" onclick="nextCase()">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section pt-4 pb-4">
+  <div class="container is-max-desktop">
+    <h2 class="section-title">Abstract</h2>
+    <div class="content">
+      <p>
+        3D Gaussian Splatting (3DGS) has emerged as a prominent paradigm for 3D reconstruction and novel view synthesis. However, it remains vulnerable to severe artifacts when trained under sparse-view constraints. While recent methods attempt to rectify artifacts in rendered views using image diffusion models, they typically rely on self-attention to retrieve information from reference images. We observe that this mechanism often fails when the rendered novel views output by 3DGS are heavily corrupted: damaged query features lead to erroneous cross-view retrieval, resulting in structural distortions and hallucinated contents. To address this, we propose <b>GeoQuery</b>, a geometry-guided diffusion framework that integrates generative priors with explicit geometric cues via a novel Geometry-guided Cross-view Attention (GCA) mechanism. First, by leveraging predicted depth maps and camera poses, we construct a geometry-induced correspondence field to sample reference features, forming a geometry-aligned proxy query that replaces the corrupted rendering features. Furthermore, we design a new cross-view feature aggregation pipeline, in which we restrict the cross-view attention to a local window around each proxy query to effectively retrieve useful features while suppressing spurious matches. <b>GeoQuery</b> can be seamlessly integrated into existing diffusion-based pipelines, enabling robust reconstruction even under extreme view sparsity. Extensive experiments on sparse-view view synthesis and rendering artifacts removal demonstrate the effectiveness of our approach.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section method-section pt-5 pb-5">
+  <div class="container is-max-desktop">
+    <h2 class="section-title">Method Overview</h2>
+    
+    <div class="columns is-centered has-text-centered mb-4">
+      <div class="column is-full">
+        <figure class="image">
+          <img src="./images/pipeline/pipeline.png" alt="GeoQuery Architecture" style="width: 100%; border-radius: 12px; border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        </figure>
+      </div>
+    </div>
+
+    <div class="content">
+      <p>
+        Starting from a sparse training set, we optimize a 3D Gaussian Splatting (3DGS) representation and progressively refine it through iterative rendering and supervision updates. At each step, 3DGS produces an artifact-prone rendering $\tilde{I}_t$, whose features suffer from <i>query contamination</i>. To rectify the information flow, we estimate metric depth to establish a geometric correspondence field.
+        The proposed <b>Geometry-Guided Cross-View Attention (GCA)</b> module bypasses corrupted target features by retrieving <b>Geometry-Indexed Proxy Features</b> directly from the clean reference space. To enforce structural consistency, we restrict feature retrieval to a $k \times k$ localized spatial neighborhood around the indexed correspondence. An Adaptive Feature Fusion mechanism, modulated by a learned spatial gating map $w$, dynamically integrates this geometry-guided evidence into the diffusion backbone. The resulting high-fidelity restoration $\hat{I}_t$ serves as a pseudo-observation to provide stronger supervision for subsequent 3DGS refinement.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section pt-5 pb-5">
+  <div class="container is-max-widescreen">
+    <h2 class="section-title">Sparse Novel View Synthesis</h2>
+
+    <h3 class="title is-4 has-text-centered" style="margin-bottom: 1.2rem;">Mip-NeRF 360 Dataset</h3>
+    
+    <div class="tabs is-toggle is-toggle-rounded is-centered mb-4">
+      <ul>
+        <li class="is-active" onclick="switchViewMode('mip', '3v', this)"><a><span>3 Views</span></a></li>
+        <li onclick="switchViewMode('mip', '6v', this)"><a><span>6 Views</span></a></li>
+        <li onclick="switchViewMode('mip', '9v', this)"><a><span>9 Views</span></a></li>
+      </ul>
+    </div>
+
+    <div id="mip-3v-container">
+      <div id="mip-3v-thumbnails" class="thumbnail-nav"></div>
+      <div class="columns is-centered is-variable is-2 px-4">
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="mip-3v-img-b1" src="./images/placeholder.png" alt="3DGS" />
+              <figcaption class="slider-label label-left">Standard 3DGS</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="mip-3v-img-o1" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="mip-3v-img-b2" src="./images/placeholder.png" alt="FSGS" />
+              <figcaption class="slider-label label-left">FSGS</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="mip-3v-img-o2" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+      </div>
+    </div>
+
+    <div id="mip-6v-container" style="display: none;">
+      <div id="mip-6v-thumbnails" class="thumbnail-nav"></div>
+      <div class="columns is-centered is-variable is-2 px-4">
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="mip-6v-img-b1" src="./images/placeholder.png" alt="3DGS" />
+              <figcaption class="slider-label label-left">Standard 3DGS</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="mip-6v-img-o1" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="mip-6v-img-b2" src="./images/placeholder.png" alt="FSGS" />
+              <figcaption class="slider-label label-left">FSGS</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="mip-6v-img-o2" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+      </div>
+    </div>
+
+    <div id="mip-9v-container" style="display: none;">
+      <div id="mip-9v-thumbnails" class="thumbnail-nav"></div>
+      <div class="columns is-centered is-variable is-2 px-4">
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="mip-9v-img-b1" src="./images/placeholder.png" alt="3DGS" />
+              <figcaption class="slider-label label-left">Standard 3DGS</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="mip-9v-img-o1" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="mip-9v-img-b2" src="./images/placeholder.png" alt="FSGS" />
+              <figcaption class="slider-label label-left">FSGS</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="mip-9v-img-o2" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+      </div>
+    </div>
+
+    <hr style="background-color: #eaeaea; height: 1px; margin: 2.5rem 0;">
+
+    <h3 class="title is-4 has-text-centered" style="margin-bottom: 1.2rem;">DL3DV-Benchmark Dataset</h3>
+    
+    <div class="tabs is-toggle is-toggle-rounded is-centered mb-4">
+      <ul>
+        <li class="is-active" onclick="switchViewMode('dl', '3v', this)"><a><span>3 Views</span></a></li>
+        <li onclick="switchViewMode('dl', '6v', this)"><a><span>6 Views</span></a></li>
+        <li onclick="switchViewMode('dl', '9v', this)"><a><span>9 Views</span></a></li>
+      </ul>
+    </div>
+
+    <div id="dl-3v-container">
+      <div id="dl-3v-thumbnails" class="thumbnail-nav"></div>
+      <div class="columns is-centered is-variable is-2 px-4">
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="dl-3v-img-b1" src="./images/placeholder.png" alt="3DGS" />
+              <figcaption class="slider-label label-left">Standard 3DGS</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="dl-3v-img-o1" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="dl-3v-img-b2" src="./images/placeholder.png" alt="DIFIX3D+" />
+              <figcaption class="slider-label label-left">DIFIX3D+</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="dl-3v-img-o2" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+      </div>
+    </div>
+
+    <div id="dl-6v-container" style="display: none;">
+      <div id="dl-6v-thumbnails" class="thumbnail-nav"></div>
+      <div class="columns is-centered is-variable is-2 px-4">
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="dl-6v-img-b1" src="./images/placeholder.png" alt="3DGS" />
+              <figcaption class="slider-label label-left">Standard 3DGS</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="dl-6v-img-o1" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="dl-6v-img-b2" src="./images/placeholder.png" alt="DIFIX3D+" />
+              <figcaption class="slider-label label-left">DIFIX3D+</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="dl-6v-img-o2" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+      </div>
+    </div>
+
+    <div id="dl-9v-container" style="display: none;">
+      <div id="dl-9v-thumbnails" class="thumbnail-nav"></div>
+      <div class="columns is-centered is-variable is-2 px-4">
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="dl-9v-img-b1" src="./images/placeholder.png" alt="3DGS" />
+              <figcaption class="slider-label label-left">Standard 3DGS</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="dl-9v-img-o1" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+        <div class="column is-half">
+          <img-comparison-slider hover="hover">
+            <figure slot="first" class="slider-figure">
+              <img id="dl-9v-img-b2" src="./images/placeholder.png" alt="DIFIX3D+" />
+              <figcaption class="slider-label label-left">DIFIX3D+</figcaption>
+            </figure>
+            <figure slot="second" class="slider-figure">
+              <img id="dl-9v-img-o2" src="./images/placeholder.png" alt="GeoQuery" />
+              <figcaption class="slider-label label-right">GeoQuery</figcaption>
+            </figure>
+          </img-comparison-slider>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer pt-5 pb-5" style="background-color: #f5f5f5; border-top: 1px solid #eaeaea;">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p style="color: #666;">
+        The website template is borrowed from <a href="https://github.com/nerfies/nerfies.github.io" target="_blank" style="color: #3273dc;">Nerfies</a>.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script>
+    // ==========================================
+    // 1. Artifact Removal 轮播控制 (Teaser)
+    // ==========================================
+    const carouselData = [
+      { img3dgs: "./images/artifacts_removal/case1/3dgs.png", difix: "./images/artifacts_removal/case1/difix.png", ours: "./images/artifacts_removal/case1/geoquery.png" },
+      { img3dgs: "./images/artifacts_removal/case2/3dgs.png", difix: "./images/artifacts_removal/case2/difix.png", ours: "./images/artifacts_removal/case2/geoquery.png" },
+      { img3dgs: "./images/artifacts_removal/case3/3dgs.png", difix: "./images/artifacts_removal/case3/difix.png", ours: "./images/artifacts_removal/case3/geoquery.png" },
+      { img3dgs: "./images/artifacts_removal/case4/3dgs.png", difix: "./images/artifacts_removal/case4/difix.png", ours: "./images/artifacts_removal/case4/geoquery.png" },
+      { img3dgs: "./images/artifacts_removal/case5/3dgs.png", difix: "./images/artifacts_removal/case5/difix.png", ours: "./images/artifacts_removal/case5/geoquery.png" },
+      { img3dgs: "./images/artifacts_removal/case6/3dgs.png", difix: "./images/artifacts_removal/case6/difix.png", ours: "./images/artifacts_removal/case6/geoquery.png" },
+      { img3dgs: "./images/artifacts_removal/case7/3dgs.png", difix: "./images/artifacts_removal/case7/difix.png", ours: "./images/artifacts_removal/case7/geoquery.png" }
+    ];
+  
+    let currentIndex = 0;
+  
+    function initThumbnails() {
+      const container = document.getElementById('thumbnail-container');
+      container.innerHTML = ''; 
+  
+      carouselData.forEach((data, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'thumbnail-btn';
+        if (index === currentIndex) btn.classList.add('is-active'); 
+        
+        btn.onclick = () => jumpToCase(index);
+  
+        const img = document.createElement('img');
+        img.src = data.ours; 
+        
+        btn.appendChild(img);
+        container.appendChild(btn);
+      });
+    }
+  
+    function updateCarousel() {
+      const data = carouselData[currentIndex];
+      
+      document.getElementById('carousel-img-3dgs').src = data.img3dgs;
+      document.getElementById('carousel-img-ours-1').src = data.ours;
+      
+      document.getElementById('carousel-img-difix').src = data.difix;
+      document.getElementById('carousel-img-ours-2').src = data.ours;
+      
+      const thumbnails = document.getElementById('thumbnail-container').children;
+      for (let i = 0; i < thumbnails.length; i++) {
+        thumbnails[i].classList.toggle('is-active', i === currentIndex);
+      }
+    }
+  
+    function jumpToCase(index) {
+      currentIndex = index;
+      updateCarousel();
+    }
+  
+    function prevCase() {
+      currentIndex = (currentIndex - 1 + carouselData.length) % carouselData.length;
+      updateCarousel();
+    }
+  
+    function nextCase() {
+      currentIndex = (currentIndex + 1) % carouselData.length;
+      updateCarousel();
+    }
+
+    // ==========================================
+    // 2. 视图切换控制逻辑 (处理 3v, 6v, 9v 选项卡)
+    // ==========================================
+    function switchViewMode(dataset, view, element) {
+      ['3v', '6v', '9v'].forEach(v => {
+        document.getElementById(`${dataset}-${v}-container`).style.display = 'none';
+      });
+      document.getElementById(`${dataset}-${view}-container`).style.display = 'block';
+      
+      const tabs = element.parentNode.children;
+      for (let t of tabs) {
+        t.classList.remove('is-active');
+      }
+      element.classList.add('is-active');
+    }
+
+    // ==========================================
+    // 3. 通用画廊构建工厂函数
+    // ==========================================
+    function createGallery(prefix, data) {
+      const thumbContainer = document.getElementById(`${prefix}-thumbnails`);
+      const b1 = document.getElementById(`${prefix}-img-b1`);
+      const o1 = document.getElementById(`${prefix}-img-o1`);
+      const b2 = document.getElementById(`${prefix}-img-b2`);
+      const o2 = document.getElementById(`${prefix}-img-o2`);
+
+      let curIdx = 0;
+
+      function update() {
+        const d = data[curIdx];
+        b1.src = d.b1; o1.src = d.o1;
+        b2.src = d.b2; o2.src = d.o2;
+
+        Array.from(thumbContainer.children).forEach((btn, i) => {
+          btn.classList.toggle('is-active', i === curIdx);
+        });
+      }
+
+      data.forEach((d, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'thumbnail-btn';
+        const img = document.createElement('img');
+        img.src = d.thumb; 
+        btn.appendChild(img);
+        btn.onclick = () => { curIdx = i; update(); };
+        thumbContainer.appendChild(btn);
+      });
+
+      update();
+    }
+
+    // ==========================================
+    // 4. 数据配置
+    // ==========================================
+    const mip3vData = [
+      { thumb: "./images/sparse_nvs/mipnerf360/3views/case1/geoquery.png", b1: "./images/sparse_nvs/mipnerf360/3views/case1/3dgs.png", o1: "./images/sparse_nvs/mipnerf360/3views/case1/geoquery.png", b2: "./images/sparse_nvs/mipnerf360/3views/case1/difix.png", o2: "./images/sparse_nvs/mipnerf360/3views/case1/geoquery.png" },
+      { thumb: "./images/sparse_nvs/mipnerf360/3views/case2/geoquery.png", b1: "./images/sparse_nvs/mipnerf360/3views/case2/3dgs.png", o1: "./images/sparse_nvs/mipnerf360/3views/case2/geoquery.png", b2: "./images/sparse_nvs/mipnerf360/3views/case2/difix.png", o2: "./images/sparse_nvs/mipnerf360/3views/case2/geoquery.png" }
+    ];
+    const mip6vData = [
+      { thumb: "./images/sparse_nvs/mipnerf360/6views/case1/geoquery.png", b1: "./images/sparse_nvs/mipnerf360/6views/case1/3dgs.png", o1: "./images/sparse_nvs/mipnerf360/6views/case1/geoquery.png", b2: "./images/sparse_nvs/mipnerf360/6views/case1/difix.png", o2: "./images/sparse_nvs/mipnerf360/6views/case1/geoquery.png" },
+      { thumb: "./images/sparse_nvs/mipnerf360/6views/case2/geoquery.png", b1: "./images/sparse_nvs/mipnerf360/6views/case2/3dgs.png", o1: "./images/sparse_nvs/mipnerf360/6views/case2/geoquery.png", b2: "./images/sparse_nvs/mipnerf360/6views/case2/difix.png", o2: "./images/sparse_nvs/mipnerf360/6views/case2/geoquery.png" }
+    ];
+    const mip9vData = [
+      { thumb: "./images/sparse_nvs/mipnerf360/9views/case1/geoquery.png", b1: "./images/sparse_nvs/mipnerf360/9views/case1/3dgs.png", o1: "./images/sparse_nvs/mipnerf360/9views/case1/geoquery.png", b2: "./images/sparse_nvs/mipnerf360/9views/case1/difix.png", o2: "./images/sparse_nvs/mipnerf360/9views/case1/geoquery.png" },
+      { thumb: "./images/sparse_nvs/mipnerf360/9views/case2/geoquery.png", b1: "./images/sparse_nvs/mipnerf360/9views/case2/3dgs.png", o1: "./images/sparse_nvs/mipnerf360/9views/case2/geoquery.png", b2: "./images/sparse_nvs/mipnerf360/9views/case2/difix.png", o2: "./images/sparse_nvs/mipnerf360/9views/case2/geoquery.png" }
+    ];
+
+    const dl3vData = [
+      { thumb: "./images/sparse_nvs/dl3dv/3views/case1/geoquery.png", b1: "./images/sparse_nvs/dl3dv/3views/case1/3dgs.png", o1: "./images/sparse_nvs/dl3dv/3views/case1/geoquery.png", b2: "./images/sparse_nvs/dl3dv/3views/case1/difix.png", o2: "./images/sparse_nvs/dl3dv/3views/case1/geoquery.png" },
+      { thumb: "./images/sparse_nvs/dl3dv/3views/case2/geoquery.png", b1: "./images/sparse_nvs/dl3dv/3views/case2/3dgs.png", o1: "./images/sparse_nvs/dl3dv/3views/case2/geoquery.png", b2: "./images/sparse_nvs/dl3dv/3views/case2/difix.png", o2: "./images/sparse_nvs/dl3dv/3views/case2/geoquery.png" }
+    ];
+    const dl6vData = [
+      { thumb: "./images/sparse_nvs/dl3dv/6views/case1/geoquery.png", b1: "./images/sparse_nvs/dl3dv/6views/case1/3dgs.png", o1: "./images/sparse_nvs/dl3dv/6views/case1/geoquery.png", b2: "./images/sparse_nvs/dl3dv/6views/case1/difix.png", o2: "./images/sparse_nvs/dl3dv/6views/case1/geoquery.png" },
+      { thumb: "./images/sparse_nvs/dl3dv/6views/case2/geoquery.png", b1: "./images/sparse_nvs/dl3dv/6views/case2/3dgs.png", o1: "./images/sparse_nvs/dl3dv/6views/case2/geoquery.png", b2: "./images/sparse_nvs/dl3dv/6views/case2/difix.png", o2: "./images/sparse_nvs/dl3dv/6views/case2/geoquery.png" }
+    ];
+    const dl9vData = [
+      { thumb: "./images/sparse_nvs/dl3dv/9views/case1/geoquery.png", b1: "./images/sparse_nvs/dl3dv/9views/case1/3dgs.png", o1: "./images/sparse_nvs/dl3dv/9views/case1/geoquery.png", b2: "./images/sparse_nvs/dl3dv/9views/case1/difix.png", o2: "./images/sparse_nvs/dl3dv/9views/case1/geoquery.png" },
+      { thumb: "./images/sparse_nvs/dl3dv/9views/case2/geoquery.png", b1: "./images/sparse_nvs/dl3dv/9views/case2/3dgs.png", o1: "./images/sparse_nvs/dl3dv/9views/case2/geoquery.png", b2: "./images/sparse_nvs/dl3dv/9views/case2/difix.png", o2: "./images/sparse_nvs/dl3dv/9views/case2/geoquery.png" }
+    ];
+
+    // ==========================================
+    // 5. 统一启动所有模块
+    // ==========================================
+    window.addEventListener('load', () => {
+      initThumbnails(); 
+
+      createGallery('mip-3v', mip3vData);
+      createGallery('mip-6v', mip6vData);
+      createGallery('mip-9v', mip9vData);
+
+      createGallery('dl-3v', dl3vData);
+      createGallery('dl-6v', dl6vData);
+      createGallery('dl-9v', dl9vData);
+    });
+</script>
+
+</body>
+</html>
