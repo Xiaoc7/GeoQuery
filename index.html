@@ -117,6 +117,49 @@
     }
     .btn-code:hover { background-color: #000000; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); }
 
+    /* SIGGRAPH 2026 会议标识 */
+    .venue-badge-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.35rem;
+      margin-bottom: 0.25rem;
+    }
+    .venue-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.72rem 1.75rem 0.72rem 1.15rem;
+      border-radius: 999px;
+      font-family: 'Google Sans', sans-serif;
+      background: linear-gradient(180deg, #fdfcfa 0%, #f4f1ea 100%);
+      color: #1a2d4a;
+      border: 1px solid rgba(26, 45, 74, 0.12);
+      box-shadow:
+        0 2px 8px rgba(26, 45, 74, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      letter-spacing: 0.06em;
+    }
+    .venue-badge::before {
+      content: '';
+      width: 5px;
+      height: 1.85rem;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #e8c547 0%, #c9a227 45%, #a67c00 100%);
+      flex-shrink: 0;
+      box-shadow: 0 1px 4px rgba(166, 124, 0, 0.25);
+    }
+    .venue-badge-name {
+      font-size: 1.48rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #1a2d4a;
+    }
+    .venue-badge-year {
+      font-size: 1.48rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: #8a6d1f;
+    }
 
     .section-title {
       font-size: 2.2rem;
@@ -336,6 +379,12 @@
               <span>Code</span>
             </a>
           </span>
+        </div>
+        <div class="venue-badge-wrap">
+          <div class="venue-badge" title="SIGGRAPH 2026">
+            <span class="venue-badge-name">SIGGRAPH</span>
+            <span class="venue-badge-year">2026</span>
+          </div>
         </div>
       </div>
     </div>
