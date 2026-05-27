@@ -1,0 +1,13 @@
+CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0} python examples_geoquery/gsplat/train_geoquery_gsplat.py default \
+    --data_dir "${SCENE_DIR:-path/to/scene}" \
+    --data_factor 4 \
+    --result_dir "${OUTPUT_DIR:-outputs/geoquery_gsplat/scene}" \
+    --test_every 8 \
+    --ckpt "${GSPLAT_CKPT:-path/to/3dgs_checkpoint.pt}" \
+    --n_views 9 \
+    --dataset_type mipnerf360 \
+    --no-normalize-world-space \
+    --low_res_only \
+    --window_size ${GEOQUERY_WINDOW_SIZE:-3} \
+    --geoquery_ckpt "${GEOQUERY_CKPT:-path/to/geoquery_checkpoint.pkl}" \
+    --depth_dir "${DEPTH_DIR:-path/to/reference_depths}"

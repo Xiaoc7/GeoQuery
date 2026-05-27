@@ -1,0 +1,17 @@
+CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0} accelerate launch src/train_geoquery.py \
+    --mixed_precision=bf16 \
+    --output_dir="${OUTPUT_DIR:-outputs/geoquery}" \
+    --dataset_path="${DATASET_JSON:-path/to/dataset.json}" \
+    --max_train_steps 100005 \
+    --learning_rate 2e-5 \
+    --input_mode "resize" \
+    --train_batch_size=1 --dataloader_num_workers 8 \
+    --enable_xformers_memory_efficient_attention \
+    --checkpointing_steps=20000 --eval_freq 20000 --viz_freq 2000 \
+    --lambda_lpips 1.0 --lambda_l2 1.0 --lambda_gram 0.5 --gram_loss_warmup_steps 5000 \
+    --report_to "wandb" --tracker_project_name "${WANDB_PROJECT:-geoquery}" \
+    --tracker_run_name "${WANDB_RUN_NAME:-geoquery_train}" --timestep 199 \
+    --gt_colmap "${GTCOLMAP_ROOT:-path/to/colmap_root}" \
+    --conf_threshold 0.0 \
+    --neighborhood_size 3 \
+    --low_res_only
