@@ -39,7 +39,7 @@
 ## News
 
 - 🎉 **2026-4-30** — Our paper **GeoQuery** has been **accepted to SIGGRAPH 2026** (Conference Track). See the [arXiv preprint](https://arxiv.org/abs/2605.12399) ([DOI](https://doi.org/10.48550/arXiv.2605.12399)).
-- ✅ **2026-5-27** — Official training and gsplat integration code is released.
+- ✅ **2026-5-27** — Official training code and model weights are released.
 
 ---
 
