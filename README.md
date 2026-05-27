@@ -1,14 +1,28 @@
-# GeoQuery: Geometry-Query Diffusion for Sparse-View Reconstruction
+<h1 align="center">GeoQuery: Geometry-Query Diffusion for Sparse-View Reconstruction</h1>
 
-[Xiao Cao](https://xiaoc7.github.io/)1, Yuze Li2, [Youmin Zhang](https://youmi-zym.github.io/)3, Jiayu Song3, [Cheng Yan](https://yancheng-tju.github.io/yancheng.github.io/)2, [Wen Li](https://scholar.google.com/citations?user=yjG4Eg4AAAAJ&hl=en)1, [Lixin Duan](https://scholar.google.com/citations?user=inRIcS0AAAAJ&hl=en)1
+<hr>
 
-1University of Electronic Science and Technology of China   2Tianjin University   3Rawmantic AI
+<div align="center">
+  <b>Accepted by SIGGRAPH 2026</b> (Conference Track)<br>
+  <a href="https://s2026.siggraph.org/">SIGGRAPH 2026</a>
+</div>
 
-**Accepted by SIGGRAPH 2026** (Conference Track) · [SIGGRAPH 2026](https://s2026.siggraph.org/)
+<br>
 
-     
+<div align="center">
+  <a href="https://xiaoc7.github.io/GeoQuery"><img src="https://img.shields.io/badge/Project-Page-green" alt="Project Page"></a>
+  &nbsp;
+  <a href="https://arxiv.org/abs/2605.12399"><img src="https://img.shields.io/badge/arXiv-2605.12399-b31b1b?logo=arxiv&logoColor=white" alt="arXiv"></a>
+  &nbsp;
+  <a href="https://huggingface.co/DIG-UESTC/GeoQuery"><img src="https://img.shields.io/badge/HuggingFace-Weights-yellow?logo=huggingface&logoColor=black" alt="Hugging Face Weights"></a>
+</div>
 
-🌟If GeoQuery is helpful for your research, please star it, your star means a lot to us!🌟.
+<br>
+
+<p align="center">
+  If GeoQuery is useful for your research, following or starring this repository
+  would help more people discover future updates.
+</p>
 
 ## News
 
@@ -22,7 +36,7 @@
 
 | Model                      | Description                                                                                   | Link                                                   |
 | -------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| GeoQuery diffusion refiner | Checkpoint for GeoQuery image restoration and gsplat integration. Use with `--geoquery_ckpt`. | [Hugging Face](https://huggingface.co/xiaoc7/GeoQuery) |
+| GeoQuery diffusion refiner | Checkpoint for GeoQuery image restoration and gsplat integration. Use with `--geoquery_ckpt`. | [Hugging Face](https://huggingface.co/DIG-UESTC/GeoQuery) |
 
 
 ---
@@ -33,9 +47,17 @@ GeoQuery improves rendered novel views by querying **geometry-aligned reference 
 
 ### Method Pipeline
 
+<p align="center">
+  <img src="assets/method_pipeline.png" alt="GeoQuery method pipeline" width="95%">
+</p>
 
-
-*Starting from a sparse training set, we optimize 3DGS and progressively refine it through iterative rendering and supervision updates. At each step, 3DGS produces an artifact-prone rendering; we estimate metric depth to build a geometric correspondence field. Geometry-Guided Cross-View Attention (GCA) retrieves proxy features from the reference view within a local neighborhood, and adaptive fusion integrates geometry-guided evidence into the diffusion backbone. The restored output serves as a pseudo-observation for subsequent 3DGS refinement.*
+<p align="center"><i>
+Starting from a sparse training set, we optimize 3DGS and progressively refine it through iterative rendering and supervision updates.
+At each step, 3DGS produces an artifact-prone rendering; we estimate metric depth to build a geometric correspondence field.
+Geometry-Guided Cross-View Attention (GCA) retrieves proxy features from the reference view within a local neighborhood,
+and adaptive fusion integrates geometry-guided evidence into the diffusion backbone.
+The restored output serves as a pseudo-observation for subsequent 3DGS refinement.
+</i></p>
 
 ### Repository Structure
 
