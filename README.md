@@ -31,8 +31,9 @@
 <br>
 
 <p align="center">
-  If GeoQuery is useful for your research, following or starring this repository
-  would help more people discover future updates.
+
+  ✨ Your star means a lot to us! Please give it a star if you find it helpful. 🌟
+
 </p>
 
 ## News
