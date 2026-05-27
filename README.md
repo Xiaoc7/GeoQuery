@@ -1,5 +1,16 @@
 <h1 align="center">GeoQuery: Geometry-Query Diffusion for Sparse-View Reconstruction</h1>
 
+<p align="center">
+  <a href="https://xiaoc7.github.io/">Xiao Cao</a>,
+  Yuze Li,
+  <a href="https://youmi-zym.github.io/">Youmin Zhang</a>,
+  Jiayu Song,
+  <a href="https://yancheng-tju.github.io/yancheng.github.io/">Cheng Yan</a>,
+  <a href="https://scholar.google.com/citations?user=yjG4Eg4AAAAJ&hl=en">Wen Li</a>,
+  <a href="https://scholar.google.com/citations?user=inRIcS0AAAAJ&hl=en">Lixin Duan</a>
+</p>
+
+
 <hr>
 
 <div align="center">
